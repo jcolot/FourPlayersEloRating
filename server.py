@@ -108,7 +108,7 @@ class myHandler(BaseHTTPRequestHandler):
             if len(players) == 1:
                 print("Aborting: only one player...")
                 return
-            if score1 == 0 and score2 == 0:
+            if score1 == "0" and score2 == "0":
                 print("Aborting: 0-0 match...")
                 return
 
