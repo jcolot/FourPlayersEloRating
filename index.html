@@ -99,7 +99,7 @@ VS
 <input type="submit" value="Submit">
 </form> 
 
-<img src="elos.png"/>
+<img id="plot" src="elos.png"/>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -130,6 +130,8 @@ $("form").submit(function(e) {
            success: function(data)
            {
             console.log(data);
+            $("#plot").attr("src", "elos.png?" + new Date().getTime());
+
            }
          });
 

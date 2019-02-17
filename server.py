@@ -25,6 +25,8 @@ class myHandler(BaseHTTPRequestHandler):
             #set the right mime type
 
             sendReply = False
+            self.path = self.path.split("?")[0]
+
             if self.path.endswith(".html"):
                 mimetype='text/html'
                 sendReply = True
@@ -76,7 +78,7 @@ class myHandler(BaseHTTPRequestHandler):
             })
 
             df_scores = pd.read_csv("./scores.csv", header=0)
-            datetime = pd.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            datetime = pd.datetime.now()
 
             player1 = form["player1"].value
             player2 = form["player2"].value
@@ -127,14 +129,12 @@ class myHandler(BaseHTTPRequestHandler):
             scores.append(int(score2))
 
             df_scores.loc[len(df_scores)]=new_score_entry
-            df_scores.to_csv("./scores.csv", sep=",", header=True, index=False)
+            df_scores.to_csv("./scores.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
             
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
             df_elos = pd.read_csv("./elos.csv", header=0, parse_dates=['datetime'], date_parser=dateparse)
-        
-            fig, axes = plt.subplots(nrows=1, ncols=1)
-            #df_elos.loc[df_elos['player'] == "Julien"].plot(x='datetime')
-
+            df_elos.sort_values("datetime")
+ 
             elos = []
 
             for player in players:
@@ -169,7 +169,7 @@ class myHandler(BaseHTTPRequestHandler):
                     updated_elos.append(elos[2] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
                     updated_elos.append(elos[3] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
                 
-            for player,updated_elo in zip(players,updated_elos):
+            for player,updated_elo in zip(players, updated_elos):
 
                 new_elo_entry = {
                     "datetime": datetime,   \
@@ -179,9 +179,20 @@ class myHandler(BaseHTTPRequestHandler):
 
                 df_elos.loc[len(df_elos)]=new_elo_entry
 
-            df_elos.to_csv("./elos.csv", sep=",", header=True, index=False)
- 
-            plt.savefig('./elos.png')
+            df_elos.to_csv("./elos.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
+
+
+            df_players = pd.read_csv("./players.csv", names=["player"])
+
+            fig, ax = plt.subplots(figsize=(8,6))
+
+            for index,row in df_players.iterrows():
+                if (df_elos.player == row["player"]).any():
+                    print(row.player)
+                    df_elos.loc[df_elos.player == row.player].plot(x="datetime", y="elo", ax=ax, label=row.player)
+
+            plt.legend()
+            plt.savefig("./elos.png")
 
             self.send_response(200)
             self.end_headers()
@@ -192,12 +203,10 @@ try:
     #incoming request
     server = HTTPServer(('', PORT_NUMBER), myHandler)
     print('Started httpserver on port ' , PORT_NUMBER)
-    webbrowser.open("localhost:8080", new=0, autoraise=True)
+    webbrowser.open("http://localhost:8080", new=0, autoraise=True)
     #Wait forever for incoming http requests
     server.serve_forever()
 
 except KeyboardInterrupt:
     print('^C received, shutting down the web server')
     server.socket.close()
-    
-
