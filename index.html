@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<style>
+select {
+width: 150px;
+}
+</style>
+
+</head>
+<body style="font-family: sans-serif">
+
+<h2>Enter match results:</h2>
+
+<form action="/send">
+<table>
+<tr>
+<td>
+  Player 1:<br>
+  <select name="player1">
+  <option value="NULL">--</option>
+  </select>
+  <br>
+  Player 2:<br>
+  <select name="player2">
+  <option value="NULL">--</option>
+  </select>
+  <br><br>
+</td>
+<td style="width:50px">
+  <select name="score1">
+  <option value="0">0</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+  <option value="13">13</option>
+  <option value="14">14</option>
+  <option value="15">15</option>
+  <option value="16">16</option>
+  <option value="17">17</option>
+  <option value="18">18</option>
+  <option value="19">19</option>
+  </select>
+</td>
+<td style="width:80px;text-align:center">
+VS
+</td>
+<td style="width:50px">
+  <select name="score2">
+  <option value="0">0</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+  <option value="13">13</option>
+  <option value="14">14</option>
+  <option value="15">15</option>
+  <option value="16">16</option>
+  <option value="17">17</option>
+  <option value="18">18</option>
+  <option value="19">19</option>
+  </select>
+</td>
+<td>
+  Player 3:<br>
+  <select name="player3">
+  <option value="NULL">--</option>
+  </select>
+  <br>
+  Player 4:<br>
+  <select name="player4">
+  <option value="NULL">--</option>
+  </select>
+  <br><br>
+</td>
+</tr>
+</table>
+<input type="submit" value="Submit">
+</form> 
+
+<img src="elos.png"/>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $.ajax({
+        url : "players.csv",
+        dataType: "text",
+        success : function (data) {
+        	var players = data.split("\n");
+            for (var i = 0; i < players.length; i++) {
+                if (players[i] != "") {
+            	    $("select[name^='player']").append($('<option>', {value: players[i], text: players[i]}));
+                }
+            }
+        }
+    });
+});
+
+$("form").submit(function(e) {
+
+
+    var form = $(this);
+    var url = form.attr('action');
+
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: form.serialize(), // serializes the form's elements.
+           success: function(data)
+           {
+            console.log(data);
+           }
+         });
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+});
+
+</script>
+</body>
+</html>
