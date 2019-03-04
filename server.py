@@ -132,7 +132,6 @@ class myHandler(BaseHTTPRequestHandler):
 
             df_scores.loc[len(df_scores)]=new_score_entry
             df_scores.to_csv("./scores.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
-            #df_scores.replace({pd.np.nan: 'NULL'})
             df_scores = df_scores.where((pd.notnull(df_scores)), 'NULL')
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
             df_elos = pd.DataFrame(columns=['datetime','match_number','player','elo'])
@@ -150,8 +149,6 @@ class myHandler(BaseHTTPRequestHandler):
                 scores.append(score_row.score1) 
                 scores.append(score_row.score2) 
 
-                print(players)
-                print(scores)
                 for player in players:
                     df_elos_player = df_elos[df_elos['player'] == player]
                     print(df_elos_player.head())
@@ -203,29 +200,8 @@ class myHandler(BaseHTTPRequestHandler):
 
             fig, ax = plt.subplots(figsize=(8,6))
             
-            #for index,row in df_players.iterrows():
-            #    if (df_elos.player == row.player).any():
-            #        df_elos_to_plot = df_elos[df_elos.player == row.player].groupby(by=df_elos.datetime.dt.date).max()
-            #        df_elos_to_plot = df_elos_to_plot.drop(["player"], axis=1)
-            #        df_elos_to_plot["datetime"] = df_elos_to_plot["datetime"].dt.date
-            #        df_elos_to_plot = df_elos_to_plot[df_elos_to_plot.datetime != datetime_now.date()]
-            #        df_elo_today = df_elos[df_elos.player == row.player]
-            #        df_elo_today = df_elo_today[df_elo_today.datetime == df_elo_today.datetime.max()]
-            #        df_elo_today["datetime"] = datetime_now
-            #        df_elo_today["datetime"] = df_elo_today["datetime"].dt.date
-            #        df_elo_today = df_elo_today.drop(["player"], axis=1)
-            #        df_elos_to_plot = df_elos_to_plot.append(df_elo_today)
-            #        df_elos_to_plot.plot(x="datetime", y="elo", ax=ax, label=row.player)
-            #        print(df_elo_today.head(20))
-            #        print(df_elos_to_plot.head(20))
-            #        plt.legend()
-            #plt.savefig("./elos.png")
-
-            #df_elos.sort_values("datetime")
-
             for index,row in df_players.iterrows():
                 if (df_elos.player == row.player).any():
-                    #df_elos[df_elos.player == row.player].plot(use_index=True, y="elo", ax=ax, label=row.player)
                     df_elos[df_elos.player == row.player].plot(x="match_number", y="elo", ax=ax, label=row.player)
                     plt.legend()
             plt.savefig("./elos.png")
