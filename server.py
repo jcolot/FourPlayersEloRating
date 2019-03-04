@@ -78,14 +78,16 @@ class myHandler(BaseHTTPRequestHandler):
             })
 
             df_scores = pd.read_csv("./scores.csv", header=0)
-            datetime = pd.datetime.now()
+            df_scores.score1.astype(int)
+            df_scores.score2.astype(int)
+            datetime_now = pd.datetime.now()
 
             player1 = form["player1"].value
             player2 = form["player2"].value
             player3 = form["player3"].value
             player4 = form["player4"].value
-            score1 = form["score1"].value
-            score2 = form["score2"].value
+            score1 = int(form["score1"].value)
+            score2 = int(form["score2"].value)
 
             players = []
             players.append(player1) if player1 != "NULL" else False
@@ -115,11 +117,11 @@ class myHandler(BaseHTTPRequestHandler):
                 return
 
             new_score_entry = {
-                "datetime": datetime,\
+                "datetime": datetime_now,\
                 "player1": player1,  \
                 "player2": player2,  \
-                "player3": player2,  \
-                "player4": player2,  \
+                "player3": player3,  \
+                "player4": player4,  \
                 "score1" : score1,   \
                 "score2" : score2    \
             }
@@ -130,68 +132,102 @@ class myHandler(BaseHTTPRequestHandler):
 
             df_scores.loc[len(df_scores)]=new_score_entry
             df_scores.to_csv("./scores.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
-            
+            #df_scores.replace({pd.np.nan: 'NULL'})
+            df_scores = df_scores.where((pd.notnull(df_scores)), 'NULL')
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
-            df_elos = pd.read_csv("./elos.csv", header=0, parse_dates=['datetime'], date_parser=dateparse)
-            df_elos.sort_values("datetime")
- 
-            elos = []
+            df_elos = pd.DataFrame(columns=['datetime','match_number','player','elo'])
 
-            for player in players:
-                elo_values = df_elos[(df_elos['datetime'] == df_elos['datetime'].max()) & (df_elos['player'] == player)].elo.values
-                elo = int(elo_values[0]) if elo_values.size == 1 else 1000
-                elos.append(elo)
+            # Rating based on https://math.stackexchange.com/questions/838809/rating-system-for-2-vs-2-2-vs-1-and-1-vs-1-game
+            for score_row in df_scores.itertuples():
+                players = []
+                elos = []
+                scores = []
+                players.append(score_row.player1) if score_row.player1 != 'NULL' else False
+                players.append(score_row.player2) if score_row.player2 != 'NULL' else False
+                players.append(score_row.player3) if score_row.player3 != 'NULL' else False
+                players.append(score_row.player4) if score_row.player4 != 'NULL' else False
+                match_datetime = score_row.datetime
+                scores.append(score_row.score1) 
+                scores.append(score_row.score2) 
 
-            
-            expected_scores = []
-            updated_elos = []
+                print(players)
+                print(scores)
+                for player in players:
+                    df_elos_player = df_elos[df_elos['player'] == player]
+                    print(df_elos_player.head())
+                    elo_values = df_elos_player[df_elos_player.index == df_elos_player.index.max()].elo.values
+                    elo = int(elo_values[0]) if elo_values.size == 1 else 1000
+                    elos.append(elo)
 
-            if len(players) == 2:
-                expected_scores.append(1 / (1 + 10**((elos[1] - elos[0])/500)))
-                expected_scores.append(1 / (1 + 10**((elos[0] - elos[1])/500)))
-                if scores[0] > scores[1]:
-                    updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                    updated_elos.append(elos[1] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[1])) 
+                expected_scores = []
+                updated_elos = []
+
+                if len(players) == 2:
+                    expected_scores.append(1 / (1 + 10**((elos[1] - elos[0])/500)))
+                    expected_scores.append(1 / (1 + 10**((elos[0] - elos[1])/500)))
+                    if scores[0] > scores[1]:
+                        updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[1] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[1])) 
+                    else:
+                        updated_elos.append(elos[0] + 100 * ((1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[0])))
+                        updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
                 else:
-                    updated_elos.append(elos[0] + 100 * ((1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[0])))
-                    updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
-            else:
-                expected_scores.append(1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500)))
-                expected_scores.append(1 / (1 + 10**(((((elos[0] + elos[1]) / 2) - ((elos[2] + elos[3])) / 2)) / 500)))
-                if scores[0] > scores[1]:
-                    updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                    updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                    updated_elos.append(elos[2] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
-                    updated_elos.append(elos[3] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
-                else:
-                    updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                    updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                    updated_elos.append(elos[2] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
-                    updated_elos.append(elos[3] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
-                
-            for player,updated_elo in zip(players, updated_elos):
+                    expected_scores.append(1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500)))
+                    expected_scores.append(1 / (1 + 10**(((((elos[0] + elos[1]) / 2) - ((elos[2] + elos[3])) / 2)) / 500)))
+                    if scores[0] > scores[1]:
+                        updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[2] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
+                        updated_elos.append(elos[3] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
+                    else:
+                        updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[2] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
+                        updated_elos.append(elos[3] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
+                    
+                print("Player is " + players[1] + " " + str(elo) + " " + str(elos[1]) + " " +str(updated_elos[1]))
+                for player,updated_elo in zip(players,updated_elos): 
+                    print(player)
+                    new_elo_entry = {
+                        "datetime":     match_datetime,     \
+                        "match_number": score_row.Index,    \
+                        "player"  :     player,             \
+                        "elo"     :     int(updated_elo)    \
+                    }
 
-                new_elo_entry = {
-                    "datetime": datetime,   \
-                    "player"  : player,    \
-                    "elo"     : int(updated_elo) \
-                }
+                    df_elos.loc[len(df_elos)]=new_elo_entry
 
-                df_elos.loc[len(df_elos)]=new_elo_entry
-
-            df_elos.to_csv("./elos.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
-
+                df_elos.to_csv("./elos.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
 
             df_players = pd.read_csv("./players.csv", names=["player"])
 
             fig, ax = plt.subplots(figsize=(8,6))
+            
+            #for index,row in df_players.iterrows():
+            #    if (df_elos.player == row.player).any():
+            #        df_elos_to_plot = df_elos[df_elos.player == row.player].groupby(by=df_elos.datetime.dt.date).max()
+            #        df_elos_to_plot = df_elos_to_plot.drop(["player"], axis=1)
+            #        df_elos_to_plot["datetime"] = df_elos_to_plot["datetime"].dt.date
+            #        df_elos_to_plot = df_elos_to_plot[df_elos_to_plot.datetime != datetime_now.date()]
+            #        df_elo_today = df_elos[df_elos.player == row.player]
+            #        df_elo_today = df_elo_today[df_elo_today.datetime == df_elo_today.datetime.max()]
+            #        df_elo_today["datetime"] = datetime_now
+            #        df_elo_today["datetime"] = df_elo_today["datetime"].dt.date
+            #        df_elo_today = df_elo_today.drop(["player"], axis=1)
+            #        df_elos_to_plot = df_elos_to_plot.append(df_elo_today)
+            #        df_elos_to_plot.plot(x="datetime", y="elo", ax=ax, label=row.player)
+            #        print(df_elo_today.head(20))
+            #        print(df_elos_to_plot.head(20))
+            #        plt.legend()
+            #plt.savefig("./elos.png")
+
+            #df_elos.sort_values("datetime")
 
             for index,row in df_players.iterrows():
-                if (df_elos.player == row["player"]).any():
-                    print(row.player)
-                    df_elos.loc[df_elos.player == row.player].plot(x="datetime", y="elo", ax=ax, label=row.player)
-
-            plt.legend()
+                if (df_elos.player == row.player).any():
+                    #df_elos[df_elos.player == row.player].plot(use_index=True, y="elo", ax=ax, label=row.player)
+                    df_elos[df_elos.player == row.player].plot(x="match_number", y="elo", ax=ax, label=row.player)
+                    plt.legend()
             plt.savefig("./elos.png")
 
             self.send_response(200)
