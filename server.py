@@ -95,43 +95,45 @@ class myHandler(BaseHTTPRequestHandler):
             players.append(player3) if player3 != "NULL" else False
             players.append(player4) if player4 != "NULL" else False
 
+            proceed = True
 
             # Some sanity checks
             if len(players) == 2 and player1 == "NULL" and player2 == "NULL":
                 print("Aborting: one-sided kicker was provided")
-                return
+                proceed = False
             if len(players) == 2 and player3 == "NULL" and player4 == "NULL":
                 print("Aborting: one-sided kicker was provided")
-                return
+                proceed = False
             if len(players) == 3:
                 print("Aborting: three players match cannot be rated")
-                return
+                proceed = False
             if len(players) == 0:
                 print("Aborting: no player...")
-                return
+                proceed = False
             if len(players) == 1:
                 print("Aborting: only one player...")
-                return
+                proceed = False
             if score1 == "0" and score2 == "0":
                 print("Aborting: 0-0 match...")
-                return
+                proceed = False
 
-            new_score_entry = {
-                "datetime": datetime_now,\
-                "player1": player1,  \
-                "player2": player2,  \
-                "player3": player3,  \
-                "player4": player4,  \
-                "score1" : score1,   \
-                "score2" : score2    \
-            }
+            if proceed:
+                new_score_entry = {
+                    "datetime": datetime_now,\
+                    "player1": player1,  \
+                    "player2": player2,  \
+                    "player3": player3,  \
+                    "player4": player4,  \
+                    "score1" : score1,   \
+                    "score2" : score2    \
+                }
 
-            scores = []
-            scores.append(int(score1))
-            scores.append(int(score2))
+                scores = []
+                scores.append(int(score1))
+                scores.append(int(score2))
 
-            df_scores.loc[len(df_scores)]=new_score_entry
-            df_scores.to_csv("./scores.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
+                df_scores.loc[len(df_scores)]=new_score_entry
+                df_scores.to_csv("./scores.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
             df_scores = df_scores.where((pd.notnull(df_scores)), 'NULL')
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
             df_elos = pd.DataFrame(columns=['datetime','match_number','player','elo'])
