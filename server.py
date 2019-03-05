@@ -168,7 +168,7 @@ class myHandler(BaseHTTPRequestHandler):
                         updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
                         updated_elos.append(elos[1] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[1])) 
                     else:
-                        updated_elos.append(elos[0] + 100 * ((1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[0])))
+                        updated_elos.append(elos[0] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[0]))
                         updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
                 else:
                     expected_scores.append(1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500)))
@@ -184,9 +184,7 @@ class myHandler(BaseHTTPRequestHandler):
                         updated_elos.append(elos[2] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
                         updated_elos.append(elos[3] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
                     
-                print("Player is " + players[1] + " " + str(elo) + " " + str(elos[1]) + " " +str(updated_elos[1]))
                 for player,updated_elo in zip(players,updated_elos): 
-                    print(player)
                     new_elo_entry = {
                         "datetime":     match_datetime,     \
                         "match_number": score_row.Index,    \
