@@ -198,13 +198,22 @@ class myHandler(BaseHTTPRequestHandler):
 
             df_players = pd.read_csv("./players.csv", names=["player"])
 
-            fig, ax = plt.subplots(figsize=(8,6))
-            
+            plt.style.use('fivethirtyeight')
+            fig, ax = plt.subplots(figsize=(10,6))
+           
+            color_sequence = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
+                    '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
+                    '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
+                    '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+
+ 
             for index,row in df_players.iterrows():
                 if (df_elos.player == row.player).any():
-                    df_elos[df_elos.player == row.player].plot(x="match_number", y="elo", ax=ax, label=row.player)
-                    plt.legend()
-            plt.savefig("./elos.png")
+                    df_elos[df_elos.player == row.player].plot(x="match_number", y="elo", color=color_sequence[index], ax=ax, label=row.player)
+                    #plt.annotate('%0.2f' % var.max(), xy=(1, var.max()), xytext=(8, 0), 
+                # xycoords=('axes fraction', 'data'), textcoords='offset points')
+            lgd = plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.savefig("./elos.png", bbox_extra_artists=(lgd,), bbox_inches='tight')
 
             self.send_response(200)
             self.end_headers()
