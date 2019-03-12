@@ -166,9 +166,9 @@ class myHandler(BaseHTTPRequestHandler):
                     expected_scores.append(1 / (1 + 10**((elos[0] - elos[1])/500)))
                     if scores[0] > scores[1]:
                         updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                        updated_elos.append(elos[1] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[1])) 
+                        updated_elos.append(elos[1] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[1])) 
                     else:
-                        updated_elos.append(elos[0] + 100 * (1 - (max(scores) / ((max(scores) + min(scores)))) - expected_scores[0]))
+                        updated_elos.append(elos[0] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
                         updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
                 else:
                     expected_scores.append(1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500)))
@@ -176,13 +176,13 @@ class myHandler(BaseHTTPRequestHandler):
                     if scores[0] > scores[1]:
                         updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
                         updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                        updated_elos.append(elos[2] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
-                        updated_elos.append(elos[3] + 100 * ((1 - (max(scores)/(max(scores) + min(scores)))) - expected_scores[1])) 
+                        updated_elos.append(elos[2] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[1])) 
+                        updated_elos.append(elos[3] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[1])) 
                     else:
-                        updated_elos.append(elos[0] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                        updated_elos.append(elos[1] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
-                        updated_elos.append(elos[2] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
-                        updated_elos.append(elos[3] + 100 * ((1 - (max(scores) / (max(scores) + min(scores)))) - expected_scores[1]))
+                        updated_elos.append(elos[0] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[1] + 100 * (1 - (max(scores) / (max(scores) + min(scores))) - expected_scores[0]))
+                        updated_elos.append(elos[2] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
+                        updated_elos.append(elos[3] + 100 * ((max(scores) / (max(scores) + min(scores))) - expected_scores[1]))
                     
                 for player,updated_elo in zip(players,updated_elos): 
                     new_elo_entry = {
@@ -210,8 +210,8 @@ class myHandler(BaseHTTPRequestHandler):
             for index,row in df_players.iterrows():
                 if (df_elos.player == row.player).any():
                     df_elos[df_elos.player == row.player].plot(x="match_number", y="elo", color=color_sequence[index], ax=ax, label=row.player)
-                    #plt.annotate('%0.2f' % var.max(), xy=(1, var.max()), xytext=(8, 0), 
-                # xycoords=('axes fraction', 'data'), textcoords='offset points')
+
+            plt.xlabel('Match number')
             lgd = plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
             plt.savefig("./elos.png", bbox_extra_artists=(lgd,), bbox_inches='tight')
 
