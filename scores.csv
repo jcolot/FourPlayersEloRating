@@ -39,3 +39,17 @@ datetime,player1,player2,player3,player4,score1,score2
 2019-03-12 13:09:48.155583,Julien,Mourad,Fabrice,Simon,9,11
 2019-03-12 14:00:01.722162,Julien,Thomas,Mourad,Simon,3,11
 2019-03-12 17:34:43.438443,Julien,,Thomas,,11,4
+2019-03-13 12:58:26.953428,Christophe,,Julien,,11,8
+2019-03-13 12:58:38.220601,Christophe,,Julien,,11,3
+2019-03-13 12:58:54.405793,Christophe,Fabrice,Julien,Simon,11,9
+2019-03-13 12:59:06.314587,Christophe,Fabrice,Julien,Simon,11,6
+2019-03-13 17:51:17.989695,Julien,,Mourad,,11,8
+2019-03-13 17:51:33.261953,Julien,,Mourad,,11,4
+2019-03-14 13:12:50.619629,Simon,,Julien,,11,6
+2019-03-14 13:12:57.613965,Simon,,Julien,,11,4
+2019-03-14 13:13:27.779454,Julien,,Fabrice,,11,6
+2019-03-14 13:13:42.130787,Julien,,Fabrice,,5,11
+2019-03-14 13:13:56.128027,Julien,,Fabrice,,11,8
+2019-03-15 14:21:13.890161,Julien,,Mourad,,11,3
+2019-03-18 12:37:45.685672,Christophe,,Julien,,11,5
+2019-03-18 12:43:34.356243,Christophe,NULL,Julien,NULL,15,18
