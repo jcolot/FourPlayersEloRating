@@ -138,6 +138,18 @@ class myHandler(BaseHTTPRequestHandler):
             dateparse = lambda x: pd.datetime.strptime(x, '%Y-%m-%d %H:%M:%S')
             df_elos = pd.DataFrame(columns=['datetime','match_number','player','elo'])
 
+            df_players = pd.read_csv("./players.csv", names=["player"])
+
+            for index, row in df_players.iterrows(): 
+                new_elo_entry = {
+                    "datetime":     pd.datetime.strptime("1970-01-01 00:00:00", '%Y-%m-%d %H:%M:%S'), \
+                    "match_number": 0,      \
+                    "player"  :     row[0], \
+                    "elo"     :     1000    \
+                }
+                df_elos.loc[len(df_elos)]=new_elo_entry
+
+
             # Rating based on https://math.stackexchange.com/questions/838809/rating-system-for-2-vs-2-2-vs-1-and-1-vs-1-game
             for score_row in df_scores.itertuples():
                 players = []
@@ -174,7 +186,7 @@ class myHandler(BaseHTTPRequestHandler):
                 for player,updated_elo in zip(players,updated_elos): 
                     new_elo_entry = {
                         "datetime":     match_datetime,     \
-                        "match_number": score_row.Index,    \
+                        "match_number": score_row.Index + 1,\
                         "player"  :     player,             \
                         "elo"     :     int(updated_elo)    \
                     }
@@ -183,7 +195,6 @@ class myHandler(BaseHTTPRequestHandler):
 
                 df_elos.to_csv("./elos.csv", sep=",", header=True, index=False, date_format="%Y-%m-%d %H:%M:%S")
 
-            df_players = pd.read_csv("./players.csv", names=["player"])
 
             plt.style.use('fivethirtyeight')
             fig, ax = plt.subplots(figsize=(10,6))
