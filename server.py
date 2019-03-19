@@ -159,7 +159,7 @@ class myHandler(BaseHTTPRequestHandler):
 
                 updated_elos = []
                 actual_score = max(scores) / (max(scores) + min(scores))
-                print("Actual: " + str(actual_score))
+
                 if len(players) == 2:
                     expected_score = 1 / (1 + 10**((elos[1] - elos[0])/500))
                     updated_elos.append(elos[0] + 100 * (actual_score - expected_score))
