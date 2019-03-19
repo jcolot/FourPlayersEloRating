@@ -158,18 +158,18 @@ class myHandler(BaseHTTPRequestHandler):
                     elos.append(elo)
 
                 updated_elos = []
-                actual_score = max(scores) / (max(scores) + min(scores))
+                actual_score = scores[0] / (scores[0] + scores[1])
 
                 if len(players) == 2:
                     expected_score = 1 / (1 + 10**((elos[1] - elos[0])/500))
-                    updated_elos.append(elos[0] + 100 * (actual_score - expected_score))
-                    updated_elos.append(elos[1] + 100 * (expected_score - actual_score)) 
+                    updated_elos.append(elos[0] + 10 * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + 10 * max(scores) * (expected_score - actual_score)) 
                 else:
                     expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500))
-                    updated_elos.append(elos[0] + 50 * (actual_score - expected_score))
-                    updated_elos.append(elos[1] + 50 * (actual_score - expected_score))
-                    updated_elos.append(elos[2] + 50 * (expected_score - actual_score)) 
-                    updated_elos.append(elos[3] + 50 * (expected_score - actual_score)) 
+                    updated_elos.append(elos[0] + 5 * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + 5 * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[2] + 5 * max(scores) * (expected_score - actual_score)) 
+                    updated_elos.append(elos[3] + 5 * max(scores) * (expected_score - actual_score)) 
                     
                 for player,updated_elo in zip(players,updated_elos): 
                     new_elo_entry = {
