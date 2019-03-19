@@ -153,33 +153,23 @@ class myHandler(BaseHTTPRequestHandler):
 
                 for player in players:
                     df_elos_player = df_elos[df_elos['player'] == player]
-                    print(df_elos_player.head())
                     elo_values = df_elos_player[df_elos_player.index == df_elos_player.index.max()].elo.values
                     elo = int(elo_values[0]) if elo_values.size == 1 else 1000
                     elos.append(elo)
 
                 updated_elos = []
                 actual_score = max(scores) / (max(scores) + min(scores))
+                print("Actual: " + str(actual_score))
                 if len(players) == 2:
                     expected_score = 1 / (1 + 10**((elos[1] - elos[0])/500))
-                    if scores[0] > scores[1]:
-                        updated_elos.append(elos[0] + 100 * (actual_score - expected_score))
-                        updated_elos.append(elos[1] + 100 * (expected_score - actual_score)) 
-                    else:
-                        updated_elos.append(elos[0] + 100 * (expected_score - actual_score))
-                        updated_elos.append(elos[1] + 100 * (actual_score - expected_score))
+                    updated_elos.append(elos[0] + 100 * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + 100 * (expected_score - actual_score)) 
                 else:
                     expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 500))
-                    if scores[0] > scores[1]:
-                        updated_elos.append(elos[0] + 50 * (actual_score - expected_score))
-                        updated_elos.append(elos[1] + 50 * (actual_score - expected_score))
-                        updated_elos.append(elos[2] + 50 * (expected_score - actual_score)) 
-                        updated_elos.append(elos[3] + 50 * (expected_score - actual_score)) 
-                    else:
-                        updated_elos.append(elos[0] + 50 * (expected_score - actual_score))
-                        updated_elos.append(elos[1] + 50 * (expected_score - actual_score))
-                        updated_elos.append(elos[2] + 50 * (actual_score - expected_score))
-                        updated_elos.append(elos[3] + 50 * (actual_score - expected_score))
+                    updated_elos.append(elos[0] + 50 * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + 50 * (actual_score - expected_score))
+                    updated_elos.append(elos[2] + 50 * (expected_score - actual_score)) 
+                    updated_elos.append(elos[3] + 50 * (expected_score - actual_score)) 
                     
                 for player,updated_elo in zip(players,updated_elos): 
                     new_elo_entry = {
