@@ -57,4 +57,8 @@ datetime,player1,player2,player3,player4,score1,score2
 2019-03-19 14:09:41.083300,Thomas,,Julien,,3,5
 2019-03-19 16:47:11.979675,Thomas,,Julien,,11,9
 2019-03-20 11:24:53.454040,Mourad,,Thomas,,3,11
-2019-03-20 11:25:06.847953,Mourad,NULL,Thomas,NULL,11,10
+2019-03-20 11:25:06.847953,Mourad,,Thomas,,11,10
+2019-03-20 12:10:17.096832,Julien,,Imad,,8,11
+2019-03-20 17:41:24.456325,Julien,,Mourad,,11,4
+2019-03-20 17:41:37.254290,Julien,,Mourad,,10,11
+2019-03-21 12:32:17.074406,Christophe,NULL,Julien,NULL,11,3
