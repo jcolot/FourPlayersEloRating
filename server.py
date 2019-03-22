@@ -173,11 +173,11 @@ class myHandler(BaseHTTPRequestHandler):
                 actual_score = scores[0] / (scores[0] + scores[1])
 
                 if len(players) == 2:
-                    expected_score = 1 / (1 + 10**((elos[1] - elos[0])/2000))
+                    expected_score = 1 / (1 + 10**((elos[1] - elos[0])/400))
                     updated_elos.append(elos[0] + 5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + 5 * max(scores) * (expected_score - actual_score)) 
                 else:
-                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 2000))
+                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 400))
                     updated_elos.append(elos[0] + 2.5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + 2.5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[2] + 2.5 * max(scores) * (expected_score - actual_score)) 
@@ -212,6 +212,34 @@ class myHandler(BaseHTTPRequestHandler):
             plt.xlabel('Match number')
             lgd = plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
             plt.savefig("./elos.png", bbox_extra_artists=(lgd,), bbox_inches='tight')
+
+            df_last_elos = pd.DataFrame(columns=['player', 'elo'])
+
+            for index,row in df_players.iterrows():
+                if (df_elos.player == row.player).any():
+                    elo = df_elos[df_elos.player == row.player].tail(1)['elo']
+                    new_elo_entry = {
+                        "player"  :     row.player,     \
+                        "elo"     :     int(elo)    \
+                    }
+                    df_last_elos.loc[len(df_last_elos)]=new_elo_entry
+             
+            expected_scores_html = "<table><tr><th></th>"
+            for index,row_i in df_last_elos.iterrows():
+                expected_scores_html += "<th>" + str(row_i.player) + "</th>"
+            expected_scores_html += "</tr>"
+            for index,row_i in df_last_elos.iterrows():
+                expected_scores_html += '<tr><td class="lightblue">' + str(row_i.player) + "</td>"
+                for index,row_j in df_last_elos.iterrows():
+                    expected_score = 1 / (1 + 10**((row_i.elo - row_j.elo)/400))
+                    if (expected_score > 0.5):
+                        expected_scores_html += "<td>" + format((11*(1-expected_score))/(expected_score),".2f") + "/11</td>"
+                    else:
+                        expected_scores_html += "<td>11/" + format((11*expected_score)/(1-expected_score),".2f") + "</td>"
+                expected_scores_html += "</tr>"
+            expected_scores_html += "</table>"
+            f = open("expected_scores.html", "w")
+            f.write(expected_scores_html)
 
             self.send_response(200)
             self.end_headers()

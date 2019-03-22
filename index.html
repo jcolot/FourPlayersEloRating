@@ -9,6 +9,20 @@
 select {
 width: 150px;
 }
+
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color:lightblue;
+}
+
+.lightblue {
+  background-color:lightblue;
+  font-weight: bold;
+}
 </style>
 
 </head>
@@ -115,6 +129,7 @@ $(document).ready(function() {
             }
         }
     });
+    $("#expected_scores").load("./expected_scores.html");
 });
 
 $("form").submit(function(e) {
@@ -131,6 +146,7 @@ $("form").submit(function(e) {
            {
             console.log(data);
             $("#plot").attr("src", "elos.png?" + new Date().getTime());
+            $("#expected_scores").load("./expected_scores.html");
 
            }
          });
@@ -139,5 +155,8 @@ $("form").submit(function(e) {
 });
 
 </script>
+<br>
+<h2>Expected scores</h2>
+<div id="expected_scores"></div>
 </body>
 </html>
