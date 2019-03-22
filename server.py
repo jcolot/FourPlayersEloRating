@@ -149,7 +149,7 @@ class myHandler(BaseHTTPRequestHandler):
                 }
                 df_elos.loc[len(df_elos)]=new_elo_entry
 
-
+            scale = 700
             # Rating based on https://math.stackexchange.com/questions/838809/rating-system-for-2-vs-2-2-vs-1-and-1-vs-1-game
             for score_row in df_scores.itertuples():
                 players = []
@@ -173,11 +173,11 @@ class myHandler(BaseHTTPRequestHandler):
                 actual_score = scores[0] / (scores[0] + scores[1])
 
                 if len(players) == 2:
-                    expected_score = 1 / (1 + 10**((elos[1] - elos[0])/400))
+                    expected_score = 1 / (1 + 10**((elos[1] - elos[0])/scale))
                     updated_elos.append(elos[0] + 5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + 5 * max(scores) * (expected_score - actual_score)) 
                 else:
-                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / 400))
+                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / scale))
                     updated_elos.append(elos[0] + 2.5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + 2.5 * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[2] + 2.5 * max(scores) * (expected_score - actual_score)) 
@@ -231,7 +231,7 @@ class myHandler(BaseHTTPRequestHandler):
             for index,row_i in df_last_elos.iterrows():
                 expected_scores_html += '<tr><td class="lightblue">' + str(row_i.player) + "</td>"
                 for index,row_j in df_last_elos.iterrows():
-                    expected_score = 1 / (1 + 10**((row_i.elo - row_j.elo)/400))
+                    expected_score = 1 / (1 + 10**((row_i.elo - row_j.elo)/scale))
                     if (expected_score > 0.5):
                         expected_scores_html += "<td>" + format((11*(1-expected_score))/(expected_score),".2f") + "/11</td>"
                     else:
