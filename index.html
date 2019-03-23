@@ -10,19 +10,19 @@ select {
 width: 150px;
 }
 
-td, th {
+.expected_scores td, .expected_scores th {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-th {
+.lightblue {
   background-color:lightblue;
 }
 
-.lightblue {
-  background-color:lightblue;
-  font-weight: bold;
+.bold {
+ font-weight: bold; 
 }
+
 </style>
 
 </head>
@@ -109,10 +109,21 @@ VS
   <br><br>
 </td>
 </tr>
+<tr>
+<td colspan="2">
+  K-factor: <input name="k_factor" size="20" value="5"/>
+</td>
+<td colspan="3">
+  Steepness: <input name="steepness" size="20" value="700"/>
+</td>
+<td>
+</td>
+</tr>
 </table>
+<br>
 <input type="submit" value="Submit">
 </form> 
-
+<br>
 <img id="plot" src="elos.png"/>
 <script type="text/javascript">
 

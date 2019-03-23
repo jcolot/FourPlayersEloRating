@@ -88,6 +88,8 @@ class myHandler(BaseHTTPRequestHandler):
             player4 = form["player4"].value
             score1 = int(form["score1"].value)
             score2 = int(form["score2"].value)
+            steepness =  int(form["steepness"].value)
+            k_factor = int(form["k_factor"].value)
 
             players = []
             players.append(player1) if player1 != "NULL" else False
@@ -149,7 +151,6 @@ class myHandler(BaseHTTPRequestHandler):
                 }
                 df_elos.loc[len(df_elos)]=new_elo_entry
 
-            scale = 700
             # Rating based on https://math.stackexchange.com/questions/838809/rating-system-for-2-vs-2-2-vs-1-and-1-vs-1-game
             for score_row in df_scores.itertuples():
                 players = []
@@ -173,15 +174,15 @@ class myHandler(BaseHTTPRequestHandler):
                 actual_score = scores[0] / (scores[0] + scores[1])
 
                 if len(players) == 2:
-                    expected_score = 1 / (1 + 10**((elos[1] - elos[0])/scale))
-                    updated_elos.append(elos[0] + 5 * max(scores) * (actual_score - expected_score))
-                    updated_elos.append(elos[1] + 5 * max(scores) * (expected_score - actual_score)) 
+                    expected_score = 1 / (1 + 10**((elos[1] - elos[0]) / steepness))
+                    updated_elos.append(elos[0] + k_factor * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + k_factor * max(scores) * (expected_score - actual_score)) 
                 else:
-                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / scale))
-                    updated_elos.append(elos[0] + 2.5 * max(scores) * (actual_score - expected_score))
-                    updated_elos.append(elos[1] + 2.5 * max(scores) * (actual_score - expected_score))
-                    updated_elos.append(elos[2] + 2.5 * max(scores) * (expected_score - actual_score)) 
-                    updated_elos.append(elos[3] + 2.5 * max(scores) * (expected_score - actual_score)) 
+                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / steepness))
+                    updated_elos.append(elos[0] + (k_factor / 2) * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[1] + (k_factor / 2) * max(scores) * (actual_score - expected_score))
+                    updated_elos.append(elos[2] + (k_factor / 2) * max(scores) * (expected_score - actual_score)) 
+                    updated_elos.append(elos[3] + (k_factor / 2) * max(scores) * (expected_score - actual_score)) 
                     
                 for player,updated_elo in zip(players,updated_elos): 
                     new_elo_entry = {
@@ -224,14 +225,14 @@ class myHandler(BaseHTTPRequestHandler):
                     }
                     df_last_elos.loc[len(df_last_elos)]=new_elo_entry
              
-            expected_scores_html = "<table><tr><th></th>"
+            expected_scores_html = '<table class="expected_scores"><tr><th></th>'
             for index,row_i in df_last_elos.iterrows():
-                expected_scores_html += "<th>" + str(row_i.player) + "</th>"
+                expected_scores_html += '<th class="lightblue">' + str(row_i.player) + "</th>"
             expected_scores_html += "</tr>"
             for index,row_i in df_last_elos.iterrows():
-                expected_scores_html += '<tr><td class="lightblue">' + str(row_i.player) + "</td>"
+                expected_scores_html += '<tr><td class="lightblue bold">' + str(row_i.player) + "</td>"
                 for index,row_j in df_last_elos.iterrows():
-                    expected_score = 1 / (1 + 10**((row_i.elo - row_j.elo)/scale))
+                    expected_score = 1 / (1 + 10**((row_i.elo - row_j.elo) / steepness))
                     if (expected_score > 0.5):
                         expected_scores_html += "<td>" + format((11*(1-expected_score))/(expected_score),".2f") + "/11</td>"
                     else:
