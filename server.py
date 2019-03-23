@@ -90,6 +90,8 @@ class myHandler(BaseHTTPRequestHandler):
             score2 = int(form["score2"].value)
             steepness =  int(form["steepness"].value)
             k_factor = int(form["k_factor"].value)
+            #weakest_ponderation = int(form["weakest_ponderation"].value)
+            weakest_ponderation = 5
 
             players = []
             players.append(player1) if player1 != "NULL" else False
@@ -178,7 +180,10 @@ class myHandler(BaseHTTPRequestHandler):
                     updated_elos.append(elos[0] + k_factor * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + k_factor * max(scores) * (expected_score - actual_score)) 
                 else:
-                    expected_score = 1 / (1 + 10**(((((elos[2] + elos[3]) / 2) - ((elos[0] + elos[1])) / 2)) / steepness))
+                    expected_score = 1 / (1 + 10**(\
+                            ((max(elos[2],elos[3] + min(elos[2],elos[3]) * weakest_ponderation)) / (1 + weakest_ponderation) - \
+                            (max(elos[0],elos[1] + min(elos[0],elos[1]) * weakest_ponderation)) / (1 + weakest_ponderation))   \
+                            / steepness))
                     updated_elos.append(elos[0] + (k_factor / 2) * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[1] + (k_factor / 2) * max(scores) * (actual_score - expected_score))
                     updated_elos.append(elos[2] + (k_factor / 2) * max(scores) * (expected_score - actual_score)) 
