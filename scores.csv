@@ -70,4 +70,6 @@ datetime,player1,player2,player3,player4,score1,score2
 2019-03-27 12:40:21.456842,Christophe,Julien,Mourad,Thomas,3,1
 2019-03-27 12:40:47.730443,Christophe,Mourad,Julien,Thomas,11,8
 2019-03-27 12:41:10.130303,Christophe,,Julien,,11,7
-2019-03-27 12:41:21.501347,Christophe,NULL,Julien,NULL,11,4
+2019-03-27 12:41:21.501347,Christophe,,Julien,,11,4
+2019-03-27 14:07:36.059190,Julien,Simon,Christophe,Ruben,7,11
+2019-03-27 14:07:45.621739,Julien,Simon,Christophe,Ruben,11,10
