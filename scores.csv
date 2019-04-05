@@ -90,4 +90,12 @@ datetime,player1,player2,player3,player4,score1,score2
 2019-04-03 15:14:10.063948,Christophe,,Julien,,11,8
 2019-04-03 15:15:30.817676,Christophe,,Julien,,11,8
 2019-04-03 15:15:39.024714,Christophe,,Julien,,11,8
-2019-04-03 15:15:58.823576,Christophe,NULL,Julien,NULL,11,8
+2019-04-03 15:15:58.823576,Christophe,,Julien,,11,8
+2019-04-04 17:36:41.625200,Julien,,Mourad,,11,4
+2019-04-04 17:37:00.507700,Julien,,Thomas,,11,6
+2019-04-04 17:37:19.461121,Mourad,,Thomas,,5,4
+2019-04-05 13:02:35.008947,Fabrice,,Julien,,11,7
+2019-04-05 13:02:47.989567,Fabrice,,Julien,,10,11
+2019-04-05 14:04:12.561393,Julien,,Christophe,,4,11
+2019-04-05 14:04:26.667656,Julien,,Christophe,,11,10
+2019-04-05 16:07:00.183197,Julien,NULL,Christophe,NULL,7,11
